@@ -1,0 +1,2100 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Monitoring Suite REST API",
+    "description": "## Überblick zur REST API der Monitoring Suite\nDie Monitoring Suite stellt zusätzlich zur GUI eine API zur Verfügung.  Als Datenformat wird JSON verwendet. Der Funktionsumfang wird wie nachfolgend abgegrenzt:\n- Funktionen zum Abfragen, Erstellen und Löschen von Prüfaufträgen\n- Funktionen zum Abfragen eines Status von API und Prüfaufträgen\n### Sicherheitsanforderungen\n- Um Missbrauch zu verhindern, akzeptiert die REST API nur Anfragen mit entsprechendem Token.",
+    "version": "1.0.1"
+  },
+  "tags": [
+    {
+      "name": "Status",
+      "description": "Mit Hilfe des Endpunktes kann der Status dieser REST API  oder eines einzelnen Prüfauftrages abgefragt werden."
+    },
+    {
+      "name": "Prüfaufträge",
+      "description": "Mit Hilfe des Endpunktes Prüfaufträge können - neue Prüfungen erstellt werden - vorhandene Prüfungen abgefragt, gelöscht oder aktualisiert werden"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://{server}:{port}/Monitoring/api/v1",
+      "variables": {
+        "server": {
+          "default": "localhost",
+          "description": "Sed ut perspiciatis unde omnis"
+        },
+        "port": {
+          "default": "80"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/status": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Status der REST API abfragen.",
+        "description": "Der Endpunkt prüft, ob \n- die API läuft\n- die Datenbank und das Datenbankmodell erreichbar sind",
+        "operationId": "Status_GET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusAPI"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Database not available"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/status/checktasks": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "letzten Status aller Prüfaufträge abfragen.",
+        "description": "Der Endpunkt liefert den letzten Status aller Prüfaufträge zurück.",
+        "operationId": "Status_task_GET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusCheckTasks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Database not available"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/status/{jobID}": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Status des Prüfauftrages abfragen.",
+        "description": "Der Endpunkt überprüft den Status des Prüfauftrages der übergebenen JobID. ",
+        "operationId": "Status_Job_GET",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusCheckTask"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "Check task not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask": {
+      "get": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfaufträge abfragen.",
+        "description": "Alle Informationen zu einem Prüfauftrag oder mehreren Prüfträgen abfragen. Folgende Filter können genutzt werden: a) Prüfauftragstyp, b) Querystring für den Prüfauftragsnamen. Wird kein Filter angegeben, werden alle Prüfaufträge zurück gegeben.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestCheckTaskType"
+          },
+          {
+            "$ref": "#/components/parameters/requestSearchQuery"
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckTasksAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/{jobID}": {
+      "get": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfauftrag anhand der JobID abfragen.",
+        "description": "Alle Informationen zu einem Prüfauftrag mit einer JobID abfragen.",
+        "operationId": "Pruefauftrag_JobID_Get",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckTaskAnswer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfauftrag löschen.",
+        "description": "Prüfauftrag mit der entsprechenden JobID löschen.",
+        "operationId": "CheckTask_JobID_Delete",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request successful"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/{jobID} vom Typ WMSBASIC": {
+      "put": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "WMS Prüfauftrag aktualisieren.",
+        "description": "Für jeden Prüfauftragstyp gibt es unterschiedliche Parameter.  Für die Aktualisierung müssen nur die Parameter mit gesendet werden, welche aktualisiert werden sollen.",
+        "operationId": "Pruefauftrag_JobID_wmsbasic_Put",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag vom Typ 'WMSBASIC' aktualisieren. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskWMSBASIC_Put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/{jobID} vom Typ WFSBASIC": {
+      "put": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "WFS Prüfauftrag aktualisieren.",
+        "description": "Für jeden Prüfauftragstyp gibt es unterschiedliche Parameter.  Für die Aktualisierung müssen nur die Parameter mit gesendet werden, welche aktualisiert werden sollen.",
+        "operationId": "CheckTask_JobID_wfsbasic_Put",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag vom Typ 'WFSBASIC' aktualisieren. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskWFSBASIC_Put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/{jobID} vom Typ OAFBASIC": {
+      "put": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "OAF (OGC API-Features) Prüfauftrag aktualisieren.",
+        "description": "Für jeden Prüfauftragstyp gibt es unterschiedliche Parameter.  Für die Aktualisierung müssen nur die Parameter mit gesendet werden, welche aktualisiert werden sollen.",
+        "operationId": "CheckTask_JobID_OAFBASIC_Put",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag vom Typ 'OAFBASIC' aktualisieren. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskOAFBASIC_Put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/{jobID} vom Typ HTTPCHK": {
+      "put": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "HTTP Server/Connector Prüfauftrag aktualisieren.",
+        "description": "Für jeden Prüfauftragstyp gibt es unterschiedliche Parameter.  Für die Aktualisierung müssen nur die Parameter mit gesendet werden, welche aktualisiert werden sollen.",
+        "operationId": "CheckTask_JobID_HTTPCHK_Put",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag vom Typ 'HTTPCHK' aktualisieren. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskHTTPCHK_Put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/{jobID} vom Typ SQLORACLE": {
+      "put": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Oracle Datenbank Prüfauftrag aktualisieren.",
+        "description": "Für jeden Prüfauftragstyp gibt es unterschiedliche Parameter.  Für die Aktualisierung müssen nur die Parameter mit gesendet werden, welche aktualisiert werden sollen.",
+        "operationId": "CheckTask_JobID_sqloracle_Put",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag vom Typ 'SQLORACLE' aktualisieren. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskSQLORACLE_Put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/{jobID} vom Typ SQLPG": {
+      "put": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "PostgreSQL Datenbank Prüfauftrag aktualisieren.",
+        "description": "Für jeden Prüfauftragstyp gibt es unterschiedliche Parameter.  Für die Aktualisierung müssen nur die Parameter mit gesendet werden, welche aktualisiert werden sollen.",
+        "operationId": "Pruefauftrag_JobID_sqlpg_Put",
+        "parameters": [
+          {
+            "name": "jobID",
+            "in": "path",
+            "description": "ID des Prüfauftrages",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/jobID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag aktualisieren. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskSQLPG_Put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "404": {
+            "description": "Sent JobId does not exist"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/wmsbasic": {
+      "post": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfauftrag vom Typ \"Web Map Service\" erstellen.",
+        "description": "Die WMS Prüfung fragt die konfigurierte URL an und überprüft, ob \n- ein Dokument zurückkommt \n- dieses eine gültige Struktur besitzt\n- der Layername und Styles vorliegen.\n- ein Bild zurück",
+        "operationId": "CheckTask_WMSBASIC_Post",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag erstellen. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskWMSBASIC_Post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jobIDAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "406": {
+            "description": "The path could not be used and will be rejected"
+          },
+          "412": {
+            "description": "The passed attributes are invalid  "
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/wfsbasic": {
+      "post": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfauftrag vom Typ \"Web Feature Service\" erstellen.",
+        "operationId": "CheckTask_WFSBASIC_Post",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag erstellen. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskWFSBASIC_Post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jobIDAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "406": {
+            "description": "The path could not be used and will be rejected"
+          },
+          "412": {
+            "description": "The passed attributes are invalid "
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/oafbasic": {
+      "post": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfauftrag vom Typ \"OAF (OGC API-Features)\" erstellen.",
+        "operationId": "Pruefauftrag_OAFBASIC_Post",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag erstellen.  Es muss zwingend eins der Felder (featureCap, layerAvail, featureGet) gesetzt werden!",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskOAFBASIC_Post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jobIDAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "406": {
+            "description": "The path could not be used and will be rejected"
+          },
+          "412": {
+            "description": "The passed attributes are invalid   "
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/httpchk": {
+      "post": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfauftrag vom Typ \"HTTP Server/Connector\" erstellen.",
+        "operationId": "CheckTask_Post_HTTPCHK",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag erstellen. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskHTTPCHK_Post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jobIDAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "406": {
+            "description": "The path could not be used and will be rejected"
+          },
+          "412": {
+            "description": "The passed attributes are invalid"
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/sqloracle": {
+      "post": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfauftrag vom Typ \"Oracle Datenbank\" erstellen.",
+        "operationId": "CheckTask_sqloracle_Post",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag erstellen. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskSQLORACLE_Post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jobIDAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "406": {
+            "description": "The path could not be used and will be rejected"
+          },
+          "412": {
+            "description": "The passed attributes are invalid   "
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/checktask/sqlpg": {
+      "post": {
+        "tags": [
+          "Prüfaufträge"
+        ],
+        "summary": "Prüfauftrag vom Typ \"PostgreSQL Datenbank\" erstellen.",
+        "operationId": "CheckTask_SQLPG_Post",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/requestToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Informationen zum Prüfauftrag erstellen. ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckTaskSQLPG_Post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jobIDAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "No authorization"
+          },
+          "406": {
+            "description": "The path could not be used and will be rejected"
+          },
+          "412": {
+            "description": "The passed attributes are invalid   "
+          },
+          "500": {
+            "description": "API not ready"
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "requestCheckTaskType": {
+        "name": "taskType",
+        "in": "query",
+        "description": "Es erfolgt eine Suche nach Prüfaufträgen des entsprechenden Typs.",
+        "schema": {
+          "$ref": "#/components/schemas/CheckTaskType"
+        }
+      },
+      "requestSearchQuery": {
+        "name": "taskName",
+        "in": "query",
+        "description": "Es erfolgt eine Like Suche in den Daten über alle Prüfauftragsnamen.  ",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "requestToken": {
+        "name": "token",
+        "required": true,
+        "in": "header",
+        "description": "Token, welcher in der Anwendung konfiguriert wird. Mindestens 12 Zeichen. ",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "StatusAPI": {
+        "type": "object",
+        "properties": {
+          "healthy": {
+            "type": "boolean",
+            "description": "Gibt an, ob die Schnittstelle bereit ist oder nicht."
+          },
+          "database": {
+            "type": "boolean",
+            "description": "Gibt an, ob die Datenbank erreichbar ist oder nicht."
+          }
+        }
+      },
+      "StatusCheckTasks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/StatusCheckTask"
+        }
+      },
+      "StatusCheckTask": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Status des Prüfauftrages.",
+            "example": true
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Prüfauftrag OK - arbeitet innerhalb der vorgegebenen Parameter",
+              "Prüfauftrag nicht OK - läuft außerhalb der vorgegebenen Parameter; gegebenenfalls liegt ein Fehler vor",
+              "Die letzte Meldung für den Prüfauftrag ist zu alt; gegebenenfalls liegt ein Fehler vor",
+              "Für diesen Prüfauftrag ist noch keine Meldung eingegangen"
+            ],
+            "example": "Prüfauftrag OK - arbeitet innerhalb der vorgegebenen Parameter"
+          },
+          "lastResult": {
+            "type": "string",
+            "example": "Prüfung erfolgreich"
+          },
+          "resultDetails": {
+            "type": "string",
+            "example": "SQL Kommando lieferte keine Daten zurück."
+          },
+          "msgTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Zeitpunkt der Meldung",
+            "readOnly": true
+          },
+          "duration": {
+            "type": "integer"
+          }
+        }
+      },
+      "CheckTaskType": {
+        "type": "string",
+        "enum": [
+          "HTTPCHK",
+          "OAFBASIC",
+          "SQLORACLE",
+          "SQLPG",
+          "WFSBASIC",
+          "WMSBASIC"
+        ],
+        "description": "- HTTPCHK   - HTTP Server/Connector Prüfung\n- OAFBASIC  - OAF Prüfung (OGC API-Features)\n- SQLORACLE - Oracle Datenbank Prüfung\n- SQLPG     - PostgreSQL Datenbank Prüfung\n- WFSBASIC  - WFS Prüfung\n- WMSBASIC  - WMS Prüfung",
+        "example": "WMSBASIC"
+      },
+      "CheckTasksAnswer": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CheckTaskAnswer"
+        }
+      },
+      "CheckTaskAnswer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/jobID"
+          },
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "type": "string",
+            "format": "date",
+            "description": "Datum ab dem der Prüfauftrag startet.",
+            "example": "2023-05-16"
+          },
+          "dateEnd": {
+            "type": "string",
+            "format": "date",
+            "description": "Datum an dem der Prüfauftrag endet.",
+            "example": "2023-05-25"
+          },
+          "timeStart": {
+            "type": "string",
+            "format": "time",
+            "description": "Der Prüfauftrag startet zur angegeben Uhrzeit.",
+            "example": "10:00"
+          },
+          "timeEnd": {
+            "type": "string",
+            "format": "time",
+            "description": "Der Prüfauftrag endet zur angegeben Uhrzeit.",
+            "example": "10:00"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "checkday0Sun": {
+            "type": "boolean",
+            "description": "Bei der Angabe true, wird der Prüfauftrag am Sonntag ausgeführt."
+          },
+          "checkday1Mon": {
+            "type": "boolean",
+            "description": "Bei der Angabe true, wird der Prüfauftrag am Montag ausgeführt."
+          },
+          "checkday2Tue": {
+            "type": "boolean",
+            "description": "Bei der Angabe true, wird der Prüfauftrag am Dienstag ausgeführt."
+          },
+          "checkday3Wed": {
+            "type": "boolean",
+            "description": "Bei der Angabe true, wird der Prüfauftrag am Mittwoch ausgeführt."
+          },
+          "checkday4Wed": {
+            "type": "boolean",
+            "description": "Bei der Angabe true, wird der Prüfauftrag am Donnerstag ausgeführt."
+          },
+          "checkday5Fri": {
+            "type": "boolean",
+            "description": "Bei der Angabe true, wird der Prüfauftrag am Freitag ausgeführt."
+          },
+          "checkday6Sat": {
+            "type": "boolean",
+            "description": "Bei der Angabe true, wird der Prüfauftrag am Samstag ausgeführt."
+          },
+          "sensor": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "#/components/schemas/CheckTaskType"
+              },
+              "config": {
+                "$ref": "#/components/schemas/SensorConfig"
+              }
+            }
+          }
+        }
+      },
+      "CheckTaskWMSBASIC_Post": {
+        "type": "object",
+        "required": [
+          "name",
+          "url",
+          "versionString"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "$ref": "#/components/schemas/url"
+          },
+          "versionString": {
+            "type": "string",
+            "enum": [
+              "1.0.1",
+              "1.1.0",
+              "1.1.1",
+              "1.3.0"
+            ]
+          },
+          "layerAvail": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "description": "Layername, welcher in der OGC WMS GetCapabilities Answer vom Server vorkommen muss.",
+            "minItems": 1,
+            "example": ""
+          },
+          "layerImgCheck": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "minItems": 1,
+            "description": "Layernamen, welche mittels eines OGC WMS GetMap Anfrageangefragt werden.  Es wird überprüft, ob ein Bild zurückgeliefert wird.  Es wird nicht geprüft, ob unterschiedliche Farbwerte im Bild vorliegen.  Wird ein weißes Bild zurückgeliefert, ist dies kein Fehler.",
+            "example": ""
+          },
+          "stylesImgCheck": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minItems": 1,
+              "description": "Die Anzahl der Styles muss mit der Anzahl der Layer übereinstimmen. Wird kein Style angegeben, wird der erste in den Capabilities definierte Style oder alternativ der Standardstyle verwendet."
+            },
+            "example": ""
+          },
+          "srs": {
+            "type": "string",
+            "maxLength": 250,
+            "default": "EPSG:25832",
+            "example": "EPSG:31467",
+            "description": "Angabe des Koordinatensystems,in der die Koordinaten für die Bounding-Boxangegeben werden. "
+          },
+          "rotation": {
+            "type": "number",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "Anwendbar nur bei WMS Prüfung für die Version 1.3.0. Als X-Y-Reihenfolge muss der Wert 0 und für Y-X-Reihenfolge muss der Wert 1 eingegeben werden."
+          },
+          "bbox": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "number",
+              "maxLength": 500
+            },
+            "description": "Mit der Angabe von Bounding-Box-Werten werden die voreingestellten Default-Werte des Service ersetzt.  Es wird dann nicht mehr das voreingestellte Gebiet geprüft, sondern nur die angegebene Bounding-Box.  Für jeden Prüfdurchgang wird ein neuerMittelpunkt innerhalb der Bounding-Box ermittelt.  Mit diesem neuen Mittelpunkt wird eine neue Bounding-Box berechnet.  Dadurch erfolgt bei jeder Prüfung eine Anfrage mit einer anderen Bounding-Box. Angabe der Koordinaten der linken unteren und der rechten oberen Ecke des Abfragefensters. Wichtig: Als Dezimaltrenner ist nur der Punkt („.“) zugelassen.  Mit dem Komma werden die Parameter separiert.",
+            "example": "555666,5920888,556666,5921888"
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "httpUser": {
+            "$ref": "#/components/schemas/httpUser"
+          },
+          "httpPass": {
+            "$ref": "#/components/schemas/httpPass"
+          }
+        }
+      },
+      "CheckTaskWFSBASIC_Post": {
+        "type": "object",
+        "required": [
+          "name",
+          "url",
+          "versionString"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "$ref": "#/components/schemas/url"
+          },
+          "versionString": {
+            "type": "string",
+            "enum": [
+              "1.1.0",
+              "2.0.0"
+            ]
+          },
+          "featureCap": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Syntax für ein Feature: {Namespace-URL}Featurename.  Feature(s), welche mittels \"GetFeature Anfrage\" überprüft werden. Sollen mehrere Features angegeben werden, so sind diese durch ein Komma zu trennen.",
+            "example": "{http://schemas.grit.de/grit}linien,{http://schemas.grit.de/grit}punkt"
+          },
+          "featureGet": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Syntax für ein Feature: {Namespace-URL}Featurename.  Es erfolgt einzelnd für jedes angegebene Feature eine Anfrage an den Server, bei der ein Element angefragt wird.  Eine Inhaltsprüfung führt nur dann zu einem positiven Ergebnis, wenn das angefragte Feature Daten enthält.  Sollen mehrere Features angegeben werden, so sind diese durch ein Komma zu trennen.",
+            "example": "{Namespace-URL}Featurename,{Namespace-URL}Featurename"
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "httpUser": {
+            "$ref": "#/components/schemas/httpUser"
+          },
+          "httpPass": {
+            "$ref": "#/components/schemas/httpPass"
+          }
+        }
+      },
+      "CheckTaskOAFBASIC_Post": {
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "$ref": "#/components/schemas/url"
+          },
+          "featureCap": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Angabe der CollectionID.  Es wird geprüft, ob die CollectionId in der Auflistung der Collections im JSON Format vorliegt.",
+            "example": "polygon,point,line"
+          },
+          "layerAvail": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Angabe der CollectionID.  Diese Inhaltsüfung prüft, ob die CollectionID Items zurück liefert.  Es wird das JSON Format angefragt.",
+            "example": "polygon,point,line"
+          },
+          "featureGet": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Angabe der FeatureID.  Syntax: {CollectionID}FeatureID  Es wird geprüft, ob die FeatureID vorliegt.  Es wird das JSON Format angefragt.",
+            "example": "{CollectionID}1,{CollectionID}2,{CollectionID}3"
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "httpUser": {
+            "$ref": "#/components/schemas/httpUser"
+          },
+          "httpPass": {
+            "$ref": "#/components/schemas/httpPass"
+          }
+        }
+      },
+      "CheckTaskHTTPCHK_Post": {
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "$ref": "#/components/schemas/url"
+          },
+          "regexpReq": {
+            "type": "string",
+            "description": "Wird kein Ausdruck angegeben, so gilt jede Answer als Gültig."
+          },
+          "regexpNot": {
+            "type": "string",
+            "description": "Trifft ein eingegebener Ausdruck auf die Rückgabe zu, so liefert der Sensor einen Fehler (auch wenn Ausdruck für eine gültige Rückgabe zutreffen würde)."
+          },
+          "validCode": {
+            "type": "string",
+            "description": "Erlaubte http Rückgabecode(s). Wird keine Liste an „Erlaubten Rückgabecodes“ angegeben, so werden alle http 2xx Rückgabecodes als gültig betrachtet."
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "httpUser": {
+            "$ref": "#/components/schemas/httpUser"
+          },
+          "httpPass": {
+            "$ref": "#/components/schemas/httpPass"
+          }
+        }
+      },
+      "CheckTaskSQLORACLE_Post": {
+        "type": "object",
+        "required": [
+          "name",
+          "url",
+          "appUser",
+          "appPass"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "type": "string",
+            "description": "Beim Instanznamen ist auf Groß-und Kleinschreibung zu achten! Syntax: Serveradresse:Port/Instanzname  Mit Instanzname ist die Oracle SID oder Servicename gemeint.  Besteht der Servicename aus weniger als 16 Zeichen oder enthält keinen Punkt, so muss dieser mit einem Punkt enden. ",
+            "example": "example.database.server.de:1521/database.serviceid.region.de"
+          },
+          "appUser": {
+            "type": "string",
+            "description": "Benutzername zur Anmeldung an die Datenbank",
+            "example": "user_name"
+          },
+          "appPass": {
+            "type": "string",
+            "description": "Passwort zur Anmeldung an die Datenbank",
+            "example": "xyz213!"
+          },
+          "sqlCmd": {
+            "type": "string",
+            "description": "Der angegebene SQL-Befehl muss mindestens eine Zeile und Spalte zurückliefern.  Der Befehl darf nicht mit einem Semikolon beendet werden.",
+            "example": "SELECT * FROM DUAL"
+          }
+        }
+      },
+      "CheckTaskSQLPG_Post": {
+        "type": "object",
+        "required": [
+          "name",
+          "url",
+          "appUser",
+          "appPass"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "type": "string",
+            "description": "Beim Datenbanknamen ist auf Groß-und Kleinschreibung zu achten! Syntax: Serveradresse:Port/Datenbankname   ",
+            "example": "example.database.server.de:5432/postgres"
+          },
+          "appUser": {
+            "type": "string",
+            "description": "Benutzername zur Anmeldung an die Datenbank",
+            "example": "user_name"
+          },
+          "appPass": {
+            "type": "string",
+            "description": "Passwort zur Anmeldung an die Datenbank",
+            "example": "xyz213!"
+          },
+          "sqlCmd": {
+            "type": "string",
+            "description": "Der angegebene SQL-Befehl muss mindestens eine Zeile und Spalte zurückliefern.  Der Befehl darf nicht mit einem Semikolon beendet werden.",
+            "example": "SELECT 1"
+          }
+        }
+      },
+      "CheckTaskWMSBASIC_Put": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "$ref": "#/components/schemas/url"
+          },
+          "versionString": {
+            "type": "string",
+            "enum": [
+              "1.0.1",
+              "1.1.0",
+              "1.1.1",
+              "1.3.0"
+            ]
+          },
+          "layerAvail": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "description": "Layername, welcher in der OGC WMS GetCapabilities Answer vom Server vorkommen muss.",
+            "minItems": 1,
+            "example": ""
+          },
+          "layerImgCheck": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "minItems": 1,
+            "description": "Layernamen, welche mittels eines OGC WMS GetMap Anfrageangefragt werden.  Es wird überprüft, ob ein Bild zurückgeliefert wird.  Es wird nicht geprüft, ob unterschiedliche Farbwerte im Bild vorliegen.  Wird ein weißes Bild zurückgeliefert, ist dies kein Fehler.",
+            "example": ""
+          },
+          "stylesImgCheck": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minItems": 1,
+              "description": "Die Anzahl der Styles muss mit der Anzahl der Layer übereinstimmen. Wird kein Style angegeben, wird der erste in den Capabilities definierte Style oder alternativ der Standardstyle verwendet."
+            },
+            "example": ""
+          },
+          "srs": {
+            "type": "string",
+            "maxLength": 250,
+            "default": "EPSG:25832",
+            "example": "EPSG:31467",
+            "description": "Angabe des Koordinatensystems,in der die Koordinaten für die Bounding-Boxangegeben werden. "
+          },
+          "rotation": {
+            "type": "number",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "Anwendbar nur bei WMS Prüfung für die Version 1.3.0. Als X-Y-Reihenfolge muss der Wert 0 und für Y-X-Reihenfolge muss der Wert 1 eingegeben werden."
+          },
+          "bbox": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "number",
+              "maxLength": 500
+            },
+            "description": "Mit der Angabe von Bounding-Box-Werten werden die voreingestellten Default-Werte des Service ersetzt.  Es wird dann nicht mehr das voreingestellte Gebiet geprüft, sondern nur die angegebene Bounding-Box.  Für jeden Prüfdurchgang wird ein neuerMittelpunkt innerhalb der Bounding-Box ermittelt.  Mit diesem neuen Mittelpunkt wird eine neue Bounding-Box berechnet.  Dadurch erfolgt bei jeder Prüfung eine Anfrage mit einer anderen Bounding-Box. Angabe der Koordinaten der linken unteren und der rechten oberen Ecke des Abfragefensters. Wichtig: Als Dezimaltrenner ist nur der Punkt („.“) zugelassen.  Mit dem Komma werden die Parameter separiert.",
+            "example": "555666,5920888,556666,5921888"
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "httpUser": {
+            "$ref": "#/components/schemas/httpUser"
+          },
+          "httpPass": {
+            "$ref": "#/components/schemas/httpPass"
+          }
+        }
+      },
+      "CheckTaskWFSBASIC_Put": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "$ref": "#/components/schemas/url"
+          },
+          "versionString": {
+            "type": "string",
+            "enum": [
+              "1.1.0",
+              "2.0.0"
+            ]
+          },
+          "featureCap": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Syntax für ein Feature: {Namespace-URL}Featurename.  Feature(s), welche mittels \"GetFeature Anfrage\" überprüft werden. Sollen mehrere Features angegeben werden, so sind diese durch ein Komma zu trennen.",
+            "example": "{http://schemas.grit.de/grit}linien,{http://schemas.grit.de/grit}punkt"
+          },
+          "featureGet": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Syntax für ein Feature: {Namespace-URL}Featurename.  Es erfolgt einzelnd für jedes angegebene Feature eine Anfrage an den Server, bei der ein Element angefragt wird.  Eine Inhaltsprüfung führt nur dann zu einem positiven Ergebnis, wenn das angefragte Feature Daten enthält.  Sollen mehrere Features angegeben werden, so sind diese durch ein Komma zu trennen.",
+            "example": "{Namespace-URL}Featurename,{Namespace-URL}Featurename"
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "httpUser": {
+            "$ref": "#/components/schemas/httpUser"
+          },
+          "httpPass": {
+            "$ref": "#/components/schemas/httpPass"
+          }
+        }
+      },
+      "CheckTaskOAFBASIC_Put": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "$ref": "#/components/schemas/url"
+          },
+          "featureCap": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Angabe der CollectionID.  Es wird geprüft, ob die CollectionId in der Auflistung der Collections im JSON Format vorliegt.",
+            "example": "polygon,point,line"
+          },
+          "layerAvail": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Angabe der CollectionID.  Diese Inhaltsüfung prüft, ob die CollectionID Items zurück liefert.  Es wird das JSON Format angefragt.",
+            "example": "polygon,point,line"
+          },
+          "featureGet": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Angabe der FeatureID.  Syntax: {CollectionID}FeatureID  Es wird geprüft, ob die FeatureID vorliegt.  Es wird das JSON Format angefragt.",
+            "example": "{CollectionID}1,{CollectionID}2,{CollectionID}3"
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "httpUser": {
+            "$ref": "#/components/schemas/httpUser"
+          },
+          "httpPass": {
+            "$ref": "#/components/schemas/httpPass"
+          }
+        }
+      },
+      "CheckTaskHTTPCHK_Put": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "$ref": "#/components/schemas/url"
+          },
+          "regexpReq": {
+            "type": "string",
+            "description": "Wird kein Ausdruck angegeben, so gilt jede Answer als Gültig."
+          },
+          "regexpNot": {
+            "type": "string",
+            "description": "Trifft ein eingegebener Ausdruck auf die Rückgabe zu, so liefert der Sensor einen Fehler (auch wenn Ausdruck für eine gültige Rückgabe zutreffen würde)."
+          },
+          "validCode": {
+            "type": "string",
+            "description": "Erlaubte http Rückgabecode(s). Wird keine Liste an „Erlaubten Rückgabecodes“ angegeben, so werden alle http 2xx Rückgabecodes als gültig betrachtet."
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "httpUser": {
+            "$ref": "#/components/schemas/httpUser"
+          },
+          "httpPass": {
+            "$ref": "#/components/schemas/httpPass"
+          }
+        }
+      },
+      "CheckTaskSQLORACLE_Put": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "type": "string",
+            "description": "Beim Instanznamen ist auf Groß-und Kleinschreibung zu achten! Syntax: Serveradresse:Port/Instanzname  Mit Instanzname ist die Oracle SID oder Servicename gemeint.  Besteht der Servicename aus weniger als 16 Zeichen oder enthält keinen Punkt, so muss dieser mit einem Punkt enden. ",
+            "example": "example.database.server.de:1521/database.serviceid.region.de"
+          },
+          "appUser": {
+            "type": "string",
+            "description": "Benutzername zur Anmeldung an die Datenbank",
+            "example": "user_name"
+          },
+          "appPass": {
+            "type": "string",
+            "description": "Passwort zur Anmeldung an die Datenbank",
+            "example": "xyz213!"
+          },
+          "sqlCmd": {
+            "type": "string",
+            "description": "Der angegebene SQL-Befehl muss mindestens eine Zeile und Spalte zurückliefern.  Der Befehl darf nicht mit einem Semikolon beendet werden.",
+            "example": "SELECT * FROM DUAL"
+          }
+        }
+      },
+      "CheckTaskSQLPG_Put": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/dateStart"
+          },
+          "dateEnd": {
+            "$ref": "#/components/schemas/dateEnd"
+          },
+          "timeStart": {
+            "$ref": "#/components/schemas/timeStart"
+          },
+          "timeEnd": {
+            "$ref": "#/components/schemas/timeEnd"
+          },
+          "pause": {
+            "$ref": "#/components/schemas/pause"
+          },
+          "timeout": {
+            "$ref": "#/components/schemas/timeout"
+          },
+          "checkday": {
+            "$ref": "#/components/schemas/checkday"
+          },
+          "url": {
+            "type": "string",
+            "description": "Beim Datenbanknamen ist auf Groß-und Kleinschreibung zu achten! Syntax: Serveradresse:Port/Datenbankname   ",
+            "example": "example.database.server.de:5432/postgres"
+          },
+          "appUser": {
+            "type": "string",
+            "description": "Benutzername zur Anmeldung an die Datenbank",
+            "example": "user_name"
+          },
+          "appPass": {
+            "type": "string",
+            "description": "Passwort zur Anmeldung an die Datenbank",
+            "example": "xyz213!"
+          },
+          "sqlCmd": {
+            "type": "string",
+            "description": "Der angegebene SQL-Befehl muss mindestens eine Zeile und Spalte zurückliefern.  Der Befehl darf nicht mit einem Semikolon beendet werden.",
+            "example": "SELECT 1"
+          }
+        }
+      },
+      "jobID": {
+        "type": "integer",
+        "description": "Eindeutiger Identifikator eines Prüfauftrages (Job).",
+        "readOnly": true
+      },
+      "jobIDAnswer": {
+        "type": "object",
+        "properties": {
+          "jobID": {
+            "$ref": "#/components/schemas/jobID"
+          }
+        }
+      },
+      "SensorConfig": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "https://www.data.example.com/geoservice/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.1.1 oder example.database.server.de:1521/database.serviceid.region.de",
+            "description": "Internet Basisadresse (URL) oder Datenbankverbindungsadresse"
+          },
+          "layerAvail": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Layername(n), welcher in der OGC WMS GetCapabilities Answer vom Server vorkommen muss bzw.  Collection(s) eines OAF bei der/denen eine Inhaltsprüfung durchgeführt wird.",
+            "minItems": 1,
+            "example": "\"flurstueck_punkt,gebaeude_bauwerk\""
+          },
+          "versionString": {
+            "type": "string",
+            "enum": [
+              "1.0.1",
+              "1.1.0",
+              "1.1.1",
+              "1.3.0",
+              "2.0.0"
+            ],
+            "description": "Versionsinformation für WMS (1.0.1, 1.1.0, 1.1.1, 1.3.0) und WFS (1.1.0, 2.0.0) Prüfung"
+          },
+          "layerImgCheck": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "Layernamen, welche mittels einer OGC WMS GetMap Anfrage angefragt werden.  Es wird überprüft, ob ein Bild zurückgeliefert wird.  Es wird nicht geprüft, ob unterschiedliche Farbwerte im Bild vorliegen.  Wird ein weißes Bild zurückgeliefert, ist dies kein Fehler.",
+            "example": "staat"
+          },
+          "httpUser": {
+            "type": "string",
+            "description": "Benutzername für eine serverseitig geforderte Authentifizierung der angegebenen URL.",
+            "example": "Benutzer"
+          },
+          "httpPass": {
+            "type": "string",
+            "description": "Passwort für eine serverseitig geforderte Authentifizierung der angegebenen URL.",
+            "example": "!Passwort01"
+          },
+          "appUser": {
+            "type": "string",
+            "description": "Benutzername zur Anmeldung an die Datenbank   ",
+            "example": "Benutzer"
+          },
+          "appPass": {
+            "type": "string",
+            "description": "Passwort zur Anmeldung an die Datenbank ",
+            "example": "!meinPass01"
+          },
+          "featureCap": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Syntax für ein Feature: {Namespace-URL}Featurename.  Es erfolgt einzelnd für jedes angegebene Feature eine Anfrage an den Server, bei der ein Element angefragt wird.  Eine Inhaltsprüfung führt nur dann zu einem positiven Ergebnis, wenn das angefragte Feature Daten enthält. ",
+            "minItems": 1,
+            "example": "{Namespace-URL}Featurename,{Namespace-URL}Featurename"
+          },
+          "featureGet": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Syntax für ein Feature: {Namespace-URL}Featurename.  Feature(s), welche mittels \"GetFeature Anfrage\" überprüft werden.",
+            "minItems": 1,
+            "example": "{http://schemas.grit.de/grit}linien,{http://schemas.grit.de/grit}punkt"
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/proxy"
+          },
+          "srs": {
+            "type": "string",
+            "default": "EPSG:25832",
+            "example": "EPSG:31467",
+            "description": "Angabe des Koordinatensystems,in der die Koordinaten für die Bounding-Boxangegeben werden. "
+          },
+          "bbox": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "number"
+            },
+            "description": "Mit der Angabe von Bounding-Box-Werten werden die voreingestellten Default-Werte des Service ersetzt.  Es wird dann nicht mehr das voreingestellte Gebiet geprüft, sondern nur die angegebene Bounding-Box.  Für jeden Prüfdurchgang wird ein neuerMittelpunkt innerhalb der Bounding-Box ermittelt.  Mit diesem neuen Mittelpunkt wird eine neue Bounding-Box berechnet.  Dadurch erfolgt bei jeder Prüfung eine Anfrage mit einer anderen Bounding-Box. Angabe der Koordinaten der linken unteren und der rechten oberen Ecke des Abfragefensters. Wichtig: Als Dezimaltrenner ist nur der Punkt („.“) zugelassen.  Mit dem Komma werden die Parameter separiert.",
+            "example": "555666,5920888,556666,5921888"
+          },
+          "stylesImgCheck": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "Die Anzahl der Styles muss mit der Anzahl der Layer übereinstimmen. Wird kein Style angegeben, wird der erste in den Capabilities definierte Style oder alternativ der Standardstyle verwendet.",
+            "example": ""
+          },
+          "regexpReq": {
+            "type": "string",
+            "description": "Regulärer Ausdruck, der auf das Rückgabedokument zutreffen muss, damit die Prüfung erfolgreich abgeschlossen werden kann.  Sonderzeichen müssen mittels „\\“ maskiert werden. Wird der Ausdruck nicht im zurückgelieferten Dokument gefunden, so meldet der Prüfauftrag einen Fehler.  Wird kein Ausdruck angegeben, so gilt jede antwort als Gültig.",
+            "example": ".*Monitoring.*"
+          },
+          "regexpNot": {
+            "type": "string",
+            "description": "Regulärer Ausdruck, der zu einem sofortigen Scheitern der Prüfung führt, wenn er auf das Rückgabedokument zutrifft. Sonderzeichen müssen mittels „\\“ maskiert werden.  Trifft ein eingegebener Ausdruck auf die Rückgabe zu, so liefert der Sensor einen Fehler (auch wenn Ausdruck für eine gültige Rückgabe zutreffen würde).",
+            "example": "FALSE"
+          },
+          "validCode": {
+            "type": "string",
+            "description": "Liste mit als gültig anzusehenden HTTP-Rückgabecodes.  Wird keine Liste an „Erlaubten Rückgabecodes“ angegeben, so werden alle http 2xx Rückgabecodes als gültig betrachtet."
+          },
+          "sqlCmd": {
+            "type": "string",
+            "description": "Der angegebene SQL-Befehl muss mindestens eine Zeile und Spalte zurückliefern.  Der Befehl darf nicht mit einem Semikolon beendet werden.",
+            "example": "(PostgreSQL) SELECT 1 / (Oracle) SELECT * FROM DUAL"
+          },
+          "rotation": {
+            "type": "number",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "Anwendbar nur bei WMS Prüfung für die Version 1.3.0. Als X-Y-Reihenfolge muss der Wert 0 und für Y-X-Reihenfolge muss der Wert 1 eingegeben werden."
+          }
+        }
+      },
+      "url": {
+        "type": "string",
+        "maxLength": 500,
+        "example": "https://www.data.example.com/geoservice/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.1.1",
+        "description": "Internet Basisadresse (URL)"
+      },
+      "proxy": {
+        "type": "string",
+        "description": "Proxyserver, über den eine Prüfung ausgeführt werden muss, wenn das Ziel nicht direkt zu erreichen ist. Syntax: Servername:Port oder IP-Adresse:Port",
+        "example": "proxy.basis.basisadresse.de:3128"
+      },
+      "httpUser": {
+        "type": "string",
+        "description": "Benutzername für eine serverseitig geforderte Authentifizierung der angegebenen URL.",
+        "example": "user_name"
+      },
+      "httpPass": {
+        "type": "string",
+        "description": "Passwort für eine serverseitig geforderte Authentifizierung der angegebenen URL.",
+        "example": "*password1!"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name für den Prüfauftrag"
+      },
+      "dateStart": {
+        "type": "string",
+        "format": "date",
+        "description": "Format yyyy-mm-dd; Wird kein Datum angegeben, so startet der Prüfauftrag nach dem dieser in der Datenbank angelegt wurde. "
+      },
+      "dateEnd": {
+        "type": "string",
+        "format": "date",
+        "description": "Format yyyy-mm-dd; Der Prüfauftrag läuft bis zum Enddatum."
+      },
+      "timeStart": {
+        "type": "string",
+        "format": "time",
+        "description": "Format hh:mm; Wird keine Startzeit angegeben, so startet der Prüfauftrag nach dem dieser in der Datenbank angelegt wurde.  Ansonsten startet der Prüfauftrag ab der angegebenen Zeit."
+      },
+      "timeEnd": {
+        "type": "string",
+        "format": "time",
+        "description": "Format hh:mm; Der Prüfauftrag läuft bis zur Endzeit."
+      },
+      "pause": {
+        "type": "integer",
+        "default": 30,
+        "description": "Angabe in Sekunden.  Die Zeitspanne für die Pause muss so gewählt werden, dass der zu überprüfende Dienst oder die zu überprüfende Datenbank die häufigen Anfragen verarbeiten kann."
+      },
+      "timeout": {
+        "type": "integer",
+        "default": 1800,
+        "description": "Angabe in Sekunden. "
+      },
+      "checkday": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Bei fehlender Angabe, wird der Prüfauftrag nicht ausgeführt.",
+        "minItems": 0,
+        "maxItems": 7,
+        "example": "mo,di,do,sa,so"
+      }
+    }
+  }
+}

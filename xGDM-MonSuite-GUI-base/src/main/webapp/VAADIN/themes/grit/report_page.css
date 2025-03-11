@@ -1,0 +1,172 @@
+/*-
+ * #%L
+ * xGDM-MonSuite GUI (Base)
+ * %%
+ * Copyright (C) 2022 - 2025 grit GmbH
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+/**
+ * Custom Styles
+ */
+
+table.sqltbl {
+	border-collapse: collapse;
+}
+
+table.sqltbl tr td {
+	padding: 4px;
+	border: 1px solid #818181;
+}
+
+table.sqltbl tr.hdr td {
+	text-align: center;
+	font-size: 14px;
+	font-weight: bold;
+	border: 1px solid #818181;
+}
+
+table.sqltbl .tleft {
+	text-align: left;
+}
+
+table.sqltbl .tcenter {
+	text-align: center;
+}
+
+
+table.sqltbl tr.row0 td {
+	background-color: #EFF0F1;
+}
+
+table.sqltbl tr.row1 td {
+	background-color: #FFFFFF;
+}
+
+// Ab hier zur Probe
+/**
+ * CheckTask/Availability- Table items out of timeframe 
+ */
+
+.v-table-checktask .v-table-row-invalid,
+.v-table-availabilitiy .v-table-row-outtf {
+	color: #2f4f4f;
+} 
+
+/**
+ * CheckTaskEditor / SensorConfigEditor
+ */
+.v-csslayout-notifications .v-csslayout-container>div {
+	display: inline-block;
+	margin-right: 5px;
+}
+
+.v-csslayout-notifications .v-csslayout-container {
+	vertical-align: top;
+}
+
+.v-form-bordered>fieldset {
+	border: thin solid #BABFC0;
+	padding: 5px;
+}
+
+.v-form-bordered.v-form-error>fieldset {
+	border: thin solid red;
+}
+
+.v-form-hideerror .v-form-errormessage {
+	display: none;
+}
+
+/**
+ * Custom Styles
+ */
+.toolbar {
+	background: #ccc url(images/gradient.png) repeat-x bottom left;
+}
+
+.toolbar-red {
+      background: #f00 url(images/gradient.png) repeat-x bottom left;
+}
+
+.toolbar-green {
+      background: #0f0 url(images/gradient.png) repeat-x bottom left;
+}
+
+.toolbar-blue {
+      background: #0376e9 url(images/gradient.png) repeat-x bottom left;
+}
+
+.toolbar-yellow {
+      background: #ff0 url(images/gradient.png) repeat-x bottom left;
+}
+
+.toolbar-violett {
+      background: #f0f url(images/gradient.png) repeat-x bottom left;
+}
+
+.toolbar-cyan {
+      background: #0ff url(images/gradient.png) repeat-x bottom left;
+}
+
+.toolbar-orange {
+      background: #f70 url(images/gradient.png) repeat-x bottom left;
+}
+
+.toolbar-title {
+	color: rgb(26, 43, 126);
+	font-weight: bold;
+	font-size: 28px;
+	/* line-height: 30px; */
+}
+
+.toolbar-version,.toolbar-user {
+	font-size: 6pt;
+	color: #000000;
+	font-size: 8pt;
+	line-height: 8pt;
+}
+
+.toolbar-user-right img {
+	float: left;
+}
+
+.title-bar {
+	background: transparent url(images/feature-controls-border.png) repeat-x
+		0 41px;
+	margin-bottom: 10px;
+}
+
+.title-text {
+	font-weight: bold;
+	font-size: 24px;
+	line-height: 28px;
+	text-shadow: 0 2px 1px #c0c1c2;
+	padding: 7px 0 8px;
+	white-space: nowrap;
+
+	/*
+	font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+	letter-spacing: -0.015em;
+	color: #1e2229;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	*/
+}

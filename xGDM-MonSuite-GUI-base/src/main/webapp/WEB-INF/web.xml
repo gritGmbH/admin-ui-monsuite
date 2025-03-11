@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  xGDM-MonSuite GUI (Base)
+  %%
+  Copyright (C) 2022 - 2025 grit GmbH
+  %%
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  #L%
+  -->
+
+<web-app 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0" metadata-complete="true">
+	<display-name>Monitoring Suite GUI</display-name>
+	<context-param>
+		<description>Vaadin production mode</description>
+		<param-name>productionMode</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<listener>
+		<listener-class>de.grit.vaadin.common.servlet.EbeanShutdownListener</listener-class>
+	</listener>
+	<servlet>
+		<servlet-name>MonitoringSuiteApplication</servlet-name>
+		<servlet-class>de.grit.vaadin.common.servlet.GritVaadinServlet</servlet-class>
+		<init-param>
+			<description>Vaadin application class to start</description>
+			<param-name>UI</param-name>
+			<param-value>de.grit.xgdm.monsuite.MonitoringSuiteApplication</param-value>
+		</init-param>
+		<init-param>
+			<description>Application widgetset</description>
+			<param-name>widgetset</param-name>
+			<param-value>de.grit.vaadin.widgetset.GritWidgetset</param-value>
+		</init-param>
+	</servlet>
+	<servlet>
+		<servlet-name>DownloadHelper</servlet-name>
+		<servlet-class>de.grit.vaadin.common.servlet.DownloadServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>SwaggerApplication</servlet-name>
+		<jsp-file>/apidoc.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DownloadHelper</servlet-name>
+		<url-pattern>/pub/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SwaggerApplication</servlet-name>
+		<url-pattern>/api</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SwaggerApplication</servlet-name>
+		<url-pattern>/api/</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SwaggerApplication</servlet-name>
+		<url-pattern>/api/v1</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SwaggerApplication</servlet-name>
+		<url-pattern>/api/v1/</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>MonitoringSuiteApplication</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
